@@ -1,5 +1,5 @@
 # python_facial_recognition
-repository for subject **(4IZ563) Agile project of Machine learning applications at Faculty of Informatics and Statistics, Prague University of Economics and Prague (VSE)**.
+Repository for subject **(4IZ563) Agile project of Machine learning applications at Faculty of Informatics and Statistics, Prague University of Economics and Prague (VSE)**.
 
 Deliverable: Facial Recognition tool
 
