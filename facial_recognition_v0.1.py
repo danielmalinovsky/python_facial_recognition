@@ -40,9 +40,8 @@ crop_img = src.face_crop(image_list[0], image_file, image_id_col, bbox_col_names
 plt.imshow(cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB))
 
 # %%
-
-cropped_shit = crop_img.resize((400, 400))
-# %%
-plt.imshow(cv2.cvtColor(cv2.resize(crop_img, (300, 300)), cv2.COLOR_BGR2RGB))
+#Resizing cropped image
+resize_crop_img = cv2.resize(crop_img, (300, 300))
+plt.imshow(cv2.cvtColor(resize_crop_img, cv2.COLOR_BGR2RGB))
 
 # %%
