@@ -45,3 +45,58 @@ resize_crop_img = cv2.resize(crop_img, (300, 300))
 plt.imshow(cv2.cvtColor(resize_crop_img, cv2.COLOR_BGR2RGB))
 
 # %%
+#reading the annotations
+from sklearn.model_selection import train_test_split
+annot_path = str(input()) #enter your path. C:/Users/ngnpe/OneDrive/Desktop/Agile_ML_zip/Anno/
+#%%
+annots = pd.read_csv(annot_path +'identity_CelebA.txt',
+                        delim_whitespace = True,
+                        header = None,
+                        names = ['jpg', 'label'])
+#filtering lables having at least 3 observations.
+labels_annot = pd.DataFrame(annots.label.value_counts(ascending=True)).query('label > 20').index.tolist()
+annots_filtered = annots[annots['label'].isin(labels_annot)]
+#Splitting the annotations
+imgs = annots_filtered['jpg']
+labels = annots_filtered['label']
+temp_imgs, test_imgs, _, __ = train_test_split(imgs, labels,
+                                               test_size = 0.2,
+                                               random_state = 123,        
+                                               stratify = labels)
+train_imgs, valid_imgs, _, __ = train_test_split(temp_imgs, _,
+                                               test_size = 0.25,
+                                               random_state = 123,        
+                                               stratify = _)
+
+# %%
+print('Export the files?')
+if input() == 'Yes':
+    train_imgs.to_csv('train_imgs.csv', index = False)
+    valid_imgs.to_csv('valid_imgs.csv', index = False)
+    test_imgs.to_csv('test_imgs.csv', index = False)
+    
+# %%
+#10 random pictures
+import random
+random.seed(123)
+random_pics = random.choices(annots_filtered['jpg'].values, k=10)
+#bounding boxes and the path
+bbox_filtered = bbox[bbox['image_id'].isin(random_pics)]
+#%%
+#path of images
+imgs_path = str(input()) #enter your path - C:/Users/ngnpe/OneDrive/Desktop/Agile_ML_zip/img_celeba.7z/img_celeba_001/
+# %%
+#Cropping 10 random pictures
+for pic in random_pics:
+    crop_img = src.face_crop(pic, imgs_path, 'image_id',
+                                bbox_col_names, bbox_filtered,
+                                show_bbox = False )
+    plt.imshow(cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB))
+    plt.show()
+#%%
+#Resizing of 10 random cropped pictures.
+for pic in random_pics:
+    crop_img = src.face_crop(pic, imgs_path, 'image_id', bbox_col_names, bbox_filtered, show_bbox = False )
+    resize_crop_img = cv2.resize(crop_img, (300, 300))
+    plt.imshow(cv2.cvtColor(resize_crop_img, cv2.COLOR_BGR2RGB))
+    plt.show()
