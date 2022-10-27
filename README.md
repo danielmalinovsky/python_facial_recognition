@@ -18,3 +18,10 @@ Goals:
 3. [DONE] Load dataset and ETL if needed
 
 - please see: facial_recognition_v0.1
+
+# Sprint 2
+### Deadline: 08.11.22
+Goals:
+1. Train/Validation/Test split (60%, 20%, 20%)
+2. Bound box creation & Image cropping
+3. Resizing of cropped image
