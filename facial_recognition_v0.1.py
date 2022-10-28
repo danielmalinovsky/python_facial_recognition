@@ -47,18 +47,23 @@ plt.imshow(cv2.cvtColor(resize_crop_img, cv2.COLOR_BGR2RGB))
 # %%
 #reading the annotations
 from sklearn.model_selection import train_test_split
-annot_path = str(input()) #enter your path. C:/Users/ngnpe/OneDrive/Desktop/Agile_ML_zip/Anno/
+annot_path = str(input()) #enter your path.
+# C:/Users/ngnpe/OneDrive/Desktop/Agile_ML_zip/Anno/
+
 #%%
 annots = pd.read_csv(annot_path +'identity_CelebA.txt',
                         delim_whitespace = True,
                         header = None,
                         names = ['jpg', 'label'])
+
 #filtering lables having at least 3 observations.
 labels_annot = pd.DataFrame(annots.label.value_counts(ascending=True)).query('label > 20').index.tolist()
 annots_filtered = annots[annots['label'].isin(labels_annot)]
 #Splitting the annotations
+
 imgs = annots_filtered['jpg']
 labels = annots_filtered['label']
+
 temp_imgs, test_imgs, _, __ = train_test_split(imgs, labels,
                                                test_size = 0.2,
                                                random_state = 123,        
@@ -80,23 +85,55 @@ if input() == 'Yes':
 import random
 random.seed(123)
 random_pics = random.choices(annots_filtered['jpg'].values, k=10)
-#bounding boxes and the path
 bbox_filtered = bbox[bbox['image_id'].isin(random_pics)]
+
 #%%
 #path of images
-imgs_path = str(input()) #enter your path - C:/Users/ngnpe/OneDrive/Desktop/Agile_ML_zip/img_celeba.7z/img_celeba_001/
+imgs_path = str(input()) #enter your path
+#C:/Users/ngnpe/OneDrive/Desktop/Agile_ML_zip/img_celeba.7z/img_celeba_001/
+
 # %%
+#Plotting 10 random pictures
+fig_1, axs_1 = plt.subplots(nrows = 5, ncols = 2, figsize = (15, 35))
+
+for pic, ax_1 in zip(random_pics, axs_1.ravel()):
+
+    image_path = imgs_path + pic
+    img = cv2.imread(image_path)
+
+    ax_1.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+
+fig_1.tight_layout()
+plt.show()
+
+#%%
 #Cropping 10 random pictures
-for pic in random_pics:
+fig_2, axs_2 = plt.subplots(nrows = 5, ncols = 2, figsize = (15, 35))
+
+for pic, ax_2 in zip(random_pics, axs_2.ravel()):
+
     crop_img = src.face_crop(pic, imgs_path, 'image_id',
-                                bbox_col_names, bbox_filtered,
-                                show_bbox = False )
-    plt.imshow(cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB))
-    plt.show()
+                             bbox_col_names, bbox_filtered,
+                             show_bbox = False)
+
+    ax_2.imshow(cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB))
+
+fig_2.tight_layout()
+plt.show()
+
 #%%
 #Resizing of 10 random cropped pictures.
-for pic in random_pics:
-    crop_img = src.face_crop(pic, imgs_path, 'image_id', bbox_col_names, bbox_filtered, show_bbox = False )
+fig_3, axs_3 = plt.subplots(nrows = 5, ncols = 2, figsize = (15, 35))
+
+for pic, ax_3 in zip(random_pics, axs_3.ravel()):
+
+    crop_img = src.face_crop(pic, imgs_path, 'image_id',
+                             bbox_col_names, bbox_filtered,
+                             show_bbox = False )
+    
     resize_crop_img = cv2.resize(crop_img, (300, 300))
-    plt.imshow(cv2.cvtColor(resize_crop_img, cv2.COLOR_BGR2RGB))
-    plt.show()
+    ax_3.imshow(cv2.cvtColor(resize_crop_img, cv2.COLOR_BGR2RGB))
+
+fig_3.tight_layout()
+plt.show()
+# %%
