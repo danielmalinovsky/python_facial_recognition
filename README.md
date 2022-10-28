@@ -22,6 +22,6 @@ Goals:
 # Sprint 2
 ### Deadline: 08.11.22
 Goals:
-1. Train/Validation/Test split (60%, 20%, 20%)
-2. Bound box creation & Image cropping
-3. Resizing of cropped image
+1. [DONE] Train/Validation/Test split (60%, 20%, 20%)
+2. [DONE] Bound box creation & image cropping
+3. [DONE] Resizing of cropped images
