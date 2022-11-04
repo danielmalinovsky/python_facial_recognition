@@ -27,6 +27,9 @@ random_seed = 123
 test_size = 0.2
 validation_size = 0.2
 
+# Bbox parameters
+method1_min_neighbours = 13
+
 # Setting column names
 image_id_col = 'image_id'
 bbox_col_names = {
@@ -101,7 +104,7 @@ bbox_generated = pd.DataFrame(columns= ['image_id', 'x_1', 'y_1', 'width', 'heig
 for pic in random_pics:
 
     img = cv2.imread(image_file+pic)
-    bbox_coordinates = src.bbox_engine(img, method= 1)
+    bbox_coordinates = src.bbox_engine(img, method = 1, m1_min_neighbors= method1_min_neighbours)
     bbox_coordinates['image_id'] = pic
     bbox_generated = bbox_generated.append(bbox_coordinates, ignore_index = True)
 
@@ -188,4 +191,11 @@ for pic, ax_4 in zip(random_pics, axs_4.ravel()):
 
 fig_4.tight_layout()
 plt.show()
+# %%
+# [Sprint 3] Dist per person
+
+plt.figure(figsize=(20,6))
+pd.DataFrame(identity.image_id.value_counts(ascending=True)).groupby('image_id').size().plot.bar()
+plt.show()
+
 # %%
