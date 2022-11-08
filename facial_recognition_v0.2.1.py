@@ -5,7 +5,13 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import random
 import os
+import numpy as np
 #import cvlib as cv
+
+#resnet 50
+from tensorflow.keras.applications.resnet50 import ResNet50
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
 
 # User defined functions
 import src.proprietary_functions as src
@@ -192,10 +198,64 @@ for pic, ax_4 in zip(random_pics, axs_4.ravel()):
 fig_4.tight_layout()
 plt.show()
 # %%
-# [Sprint 3] Dist per person
+# [Sprint 3 - TASK 1] Distribution per person
 
 plt.figure(figsize=(20,6))
 pd.DataFrame(identity.image_id.value_counts(ascending=True)).groupby('image_id').size().plot.bar()
 plt.show()
 
 # %%
+# [Sprint 3 - TASK 4] - Resnet50 with Keras application
+from PIL import Image
+img_from_array = Image.fromarray(cv2.cvtColor(resize_crop_img, cv2.COLOR_BGR2RGB))
+
+img_resnet = img_from_array.resize((224,224))
+img_resnet
+#%%
+#ResNet50 model
+model = ResNet50(weights='imagenet')
+
+x = image.img_to_array(img_resnet)
+x = np.expand_dims(x, axis=0)
+x = preprocess_input(x)
+
+preds = model.predict(x)
+print('Predicted:', decode_predictions(preds, top=3)[0])
+# %%
+
+""" # [Sprint 3 - TASK 5] - Binary Classification using Resnet on multiple inputs  
+
+# not functional yet :)
+
+def resnet50_feature_extractor():
+    input_layer = tf.keras.layers.Input(shape=(224, 224, 3))
+    model_resnet50 = ResNet50(weights='imagenet', include_top=False)
+    x = model_resnet50(input_layer)
+    #VYSTUP Z AVERAGEPOOLING2D MUSI BYT (None, 2048) misto (None,1,1,2048)
+
+    x = tf.keras.layers.AveragePooling2D(pool_size=7)(x)
+    model = tf.keras.Model(inputs=input_layer, outputs=x, name ='feature_extractor')
+    return model
+
+def classifier():
+    input_layer1 = tf.keras.layers.Input(shape=(224, 224, 3))
+    input_layer2 = tf.keras.layers.Input(shape=(224, 224, 3))
+    model_feature_extractor =  resnet50_feature_extractor()
+    feature_vector1 = model_feature_extractor(input_layer1)
+    feature_vector2 = model_feature_extractor(input_layer2)
+    diff = feature_vector1 - feature_vector2
+    x = tf.keras.layers.Dense(1, activation='sigmoid')(diff)
+
+    model = tf.keras.Model(inputs=[input_layer1,input_layer2],outputs=x)
+    return model
+ 
+
+model.compile(optimizer ='adam', loss='binary_crossentropy', metrics=['accuracy'])
+same = ('1.jpg','2.jpg')
+different = ('2,jpg','3.jpg') 0
+x1 = np.array(list(map(lambda x:)))
+x2 =
+y = np.array([0,1,0,1])
+model.fit(x=[],)
+#musi to byt vektor s jednou dimenzi a 2480 prvku...
+"""
