@@ -1,7 +1,9 @@
 # python_facial_recognition
-repository for _the Facial Image Recognition_ project in Python within the course **4IZ563 Agile Project of Machine Learning Applications** at Faculty of Informatics and Statistics, Prague University of Economics and Business (VŠE).
+Repository for _the Facial Image Recognition_ project in Python within the course **4IZ563 Agile Project of Machine Learning Applications** at Faculty of Informatics and Statistics, Prague University of Economics and Business (VŠE).
 
-Deliverable: Facial Recognition tool
+_**Deliverable**_: Facial Recognition tool
+
+_**Authors**_: Daniel Malinovsky (_*Team Leader*_), Petr Nguyen (_*Lead Data Scientist*_), Petr Hollmann, Roman Pavlata, Natalie Musilova
 
 # facial_recognition_v0.1
 - loading sample data
