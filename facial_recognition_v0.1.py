@@ -281,7 +281,7 @@ src.balanced_pairs(df_joined, 10, ['5_o_Clock_Shadow', 'Arched_Eyebrows', 'Attra
 
 src.balanced_pairs(df_joined, 15, ['Wearing_Necklace', 'Straight_Hair', 'Blond_Hair'])
 
-# %% [Sprint 3] Task 4 - Resnet 50 with keras application
+# %% [Sprint 3] Task 4 - ResNet 50 with keras application
 
 img_from_array = Image.fromarray(cv2.cvtColor(resize_crop_img, cv2.COLOR_BGR2RGB))
 
