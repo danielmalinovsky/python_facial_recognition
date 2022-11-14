@@ -1,5 +1,4 @@
 import cv2
-#import cvlib as cv
 import cvlib as cv
 from matplotlib import pyplot as plt
 import pandas as pd
