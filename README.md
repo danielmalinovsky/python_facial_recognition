@@ -50,4 +50,13 @@ _**Tasks**_:
 5. _**[DONE]**_ Binary Classification using ResNet on multiple inputs
 
 # Sprint 4
-_TBD_
+### Deadline: 29/11/2022
+_TBA_
+
+# Sprint 5
+### Deadline: 13/12/2022
+_TBA_
+
+# Final Sprint
+### Deadline: January 2023
+_TBA_
