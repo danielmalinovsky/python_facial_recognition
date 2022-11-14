@@ -1,7 +1,7 @@
 # python_facial_recognition
 Repository for _the Facial Image Recognition_ project in Python within the course **Agile Project of Machine Learning Applications (4IZ563)** at Faculty of Informatics and Statistics, Prague University of Economics and Business (VŠE). This course is being surpervised my the Data Scientists and ML Enginners at **CN Group CZ**.
 
-_**Authors**_: Daniel Malinovsky (_*Team Leader*_), [Petr Nguyen](https://www.linkedin.com/in/petr-ngn/) (_*Lead Data Scientist*_), Petr Hollmann, Roman Pavlata, Natalie Musilova
+_**Authors**_: [Daniel Malinovsky](https://www.linkedin.com/in/daniel-malinovsky-88b162198) (_*Team Leader*_), [Petr Nguyen](https://www.linkedin.com/in/petr-ngn) (_*Lead Data Scientist*_), Petr Hollmann, Roman Pavlata, Natalie Musilova
 
 _**Deliverable**_: Facial Recognition tool
 
