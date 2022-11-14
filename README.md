@@ -9,6 +9,12 @@ _**Deliverable**_: Facial Recognition tool
 # `facial_recognition_v0.1`
 - Loading sample data
 - Cropping out bounding boxes
+- Splitting the data
+- Implementing Bounding boxes generator
+- Distribution of images
+- Exploratory Data Analysis (EDA) of images' attributes
+- Implementing balanced-pairs generator
+- Classification with Residual Neural Network (ResNet)
 
 # Sprint 1 
 ### Deadline: 18/10/2022
