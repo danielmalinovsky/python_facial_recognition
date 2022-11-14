@@ -15,11 +15,9 @@ _**Deliverable**_: Facial Recognition tool
 Goals:
 1. [DONE] Prepare enviroment for running code
 2. [DONE] Find dataset used for training model
-
   - please see: [CelebA](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html)
 
 3. [DONE] Load dataset and ETL if needed
-
   - please see: facial_recognition_v0.1
 
 # Sprint 2
