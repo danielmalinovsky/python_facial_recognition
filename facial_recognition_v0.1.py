@@ -2,10 +2,21 @@
 import cv2
 from matplotlib import pyplot as plt
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
 import random
 import os
+import tensorflow as tf
+import keras as keras
+from PIL import Image
 #import cvlib as cv
+
+
+#resnet 50
+from tensorflow.keras.applications.resnet50 import ResNet50
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
+
 
 # User defined functions
 import src.proprietary_functions as src
@@ -191,11 +202,106 @@ for pic, ax_4 in zip(random_pics, axs_4.ravel()):
 
 fig_4.tight_layout()
 plt.show()
+
+
 # %%
-# [Sprint 3] Dist per person
+# [Sprint 3] Task 1 - Dist per person
 
 plt.figure(figsize=(20,6))
 pd.DataFrame(identity.image_id.value_counts(ascending=True)).groupby('image_id').size().plot.bar()
 plt.show()
 
 # %%
+# [Sprint 3] Task 2 - Graph distribution of atributes
+
+attbs = pd.read_csv("./data/Anno/list_attr_celeba.txt", delim_whitespace=True)
+dist_var_df = pd.DataFrame(columns = ['var', 'dist_1_rel', 'dist_0_rel'])
+for col in attbs.columns:
+
+    dist_1_rel = pd.DataFrame(attbs[col].value_counts(normalize = True)).loc[1,col]
+    dist_0_rel = pd.DataFrame(attbs[col].value_counts(normalize = True)).loc[-1,col]
+
+    dist_var_df = pd.concat((dist_var_df, pd.DataFrame([col, dist_1_rel, dist_0_rel]).transpose().rename(columns = {0:'var', 1:'dist_1_rel', 2:'dist_0_rel'})))
+
+dist_var_df
+# %% Plotting distributions
+
+sorted_vars = dist_var_df.sort_values(by = "dist_0_rel")
+sorted_vars = sorted_vars.set_index(sorted_vars['var'])
+
+sorted_vars.plot(kind='bar', stacked=True)
+plt.legend(['Yes', 'No'], loc = 'upper left')
+
+# %% [Sprint 3] Task 2 - Correlation Matrix (PETER)
+
+corr_df = src.corr_atrbs(attbs)
+
+# %%
+#positive associations
+corr_df.query('coef > 0.3')
+
+# %%
+#negative associations
+corr_df[corr_df['coef'] < - 0.3]
+
+# %%
+# Correlation matrix
+
+src.corr_matrix(attbs)
+
+# %%
+# Plotting correlation matrix
+
+src.corr_matrix(attbs, True)
+
+# %%
+#relative distributions of attributes
+dist_var_df = pd.DataFrame(columns = ['var', 'dist_1_rel', 'dist_0_rel'])
+
+for col in attbs.columns:
+
+    dist_1_rel = pd.DataFrame(attbs[col].value_counts(normalize = True)).loc[1,col]
+    dist_0_rel = pd.DataFrame(attbs[col].value_counts(normalize = True)).loc[-1,col]
+
+    dist_var_df = pd.concat((dist_var_df, pd.DataFrame([col, dist_1_rel, dist_0_rel]).transpose().rename(columns = {0:'var', 1:'dist_1_rel', 2:'dist_0_rel'})))
+
+dist_var_df
+
+# %%
+#joining annotations with attributes
+df_joined = identity_filtered.merge(attbs.reset_index().rename(columns = {'index':'image'}), on = 'image')
+df_joined
+
+# %% [Sprint 3] Task 3 - Generate balance pairs (PETER)
+
+src.balanced_pairs(df_joined, 10, ['5_o_Clock_Shadow', 'Arched_Eyebrows', 'Attractive'])
+
+# %%
+# generating balanced pairs
+
+src.balanced_pairs(df_joined, 15, ['Wearing_Necklace', 'Straight_Hair', 'Blond_Hair'])
+
+# %% [Sprint 3] Task 4 - Resnet 50 with keras application
+
+img_from_array = Image.fromarray(cv2.cvtColor(resize_crop_img, cv2.COLOR_BGR2RGB))
+
+img_resnet = img_from_array.resize((224,224))
+img_resnet
+
+#%%
+#ResNet50 model
+model = ResNet50(weights='imagenet')
+
+x = image.img_to_array(img_resnet)
+x = np.expand_dims(x, axis=0)
+x = preprocess_input(x)
+
+preds = model.predict(x)
+print('Predicted:', decode_predictions(preds, top=3)[0])
+
+# %% [Sprint 3] Task 5 - Resnet Binary classification
+
+
+
+# %% 
+# [Sprint 3] 
