@@ -13,7 +13,7 @@ _**Deliverable**_: Face Recognition & Detection tool implemented in Python
 - Other tasks (_Presentations of sprints, regular communication with the Product Owners, SCRUM practices_)
 
 
-# `facial_recognition_v0.1`
+## facial_recognition_v0.1`
 - Loading sample data
 - Cropping out bounding boxes
 - Splitting the data
@@ -23,7 +23,7 @@ _**Deliverable**_: Face Recognition & Detection tool implemented in Python
 - Implementing balanced-pairs generator
 - Classification with Residual Neural Network (_ResNet_)
 
-# Sprint 1 
+## Sprint 1 
 ### Deadline: 18/10/2022
 _**Tasks**_:
 1. _**[DONE]**_ Prepare enviroment for running code
@@ -33,7 +33,7 @@ _**Tasks**_:
 3. _**[DONE]**_ Load dataset and ETL (_if needed_)
    - please see: `facial_recognition_v0.1`
 
-# Sprint 2
+## Sprint 2
 ### Deadline: 08/11/2022
 _**Tasks**_:
 1. _**[DONE]**_ Train/Validation/Test split (_60%/20%/20%_)
@@ -49,14 +49,14 @@ _**Tasks**_:
 4. _**[DONE]**_ ResNet 50 with Keras application
 5. _**[DONE]**_ Binary Classification using ResNet on multiple inputs
 
-# Sprint 4
+## Sprint 4
 ### Deadline: 29/11/2022
 _TBA_
 
-# Sprint 5
+## Sprint 5
 ### Deadline: 13/12/2022
 _TBA_
 
-# Final Sprint
+## Final Sprint
 ### Deadline: January 2023
 _TBA_
