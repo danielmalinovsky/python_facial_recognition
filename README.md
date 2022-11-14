@@ -9,7 +9,7 @@ This course is being surpervised by the Data Scientists and AI & ML Enginners at
 
 _**Deliverable**_: Face Recognition & Detection tool implemented in Python
 - Business and Organizational tasks (_Backlogs and estimates_)
-- Agile Development in Machine Learning (_using packages such `Tensorflow` or `Keras`_)
+- Agile Development in Machine Learning (_using packages such_ `Tensorflow` _or_ `Keras`)
 - Other tasks (_Presentations of sprints, regular communication with the Product Owners, SCRUM practices_)
 
 
