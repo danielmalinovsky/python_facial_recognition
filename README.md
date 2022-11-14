@@ -29,8 +29,8 @@ Goals:
 # Sprint 3
 ### Deadline: 15.11.22
 Goals:
-1. Distribution of photos per person
-2. EDA of attributes (histograms, correlation analysis)
-3. Generator of balanced random pairs (pairs of 2 photos of the same person/pairs of 2 photos of 2 different persons).
-4. ResNet 50 with Keras application
-5. Binary Classification using ResNet on multiple inputs
+1. [DONE] Distribution of photos per person
+2. [DONE] EDA of attributes (histograms, correlation analysis)
+3. [DONE] Generator of balanced random pairs (pairs of 2 photos of the same person/pairs of 2 photos of 2 different persons)
+4. [DONE] ResNet 50 with Keras application
+5. [DONE] Binary Classification using ResNet on multiple inputs
