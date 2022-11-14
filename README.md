@@ -24,7 +24,7 @@ _**Deliverable**_: Face Recognition & Detection tool implemented in Python
 - Classification with Residual Neural Network (_ResNet_)
 
 ## Sprint 1 
-### Deadline: 18/10/2022
+#### Deadline: 18/10/2022
 _**Tasks**_:
 1. _**[DONE]**_ Prepare enviroment for running code
 2. _**[DONE]**_ Find dataset used for training a model
@@ -34,14 +34,14 @@ _**Tasks**_:
    - please see: `facial_recognition_v0.1`
 
 ## Sprint 2
-### Deadline: 08/11/2022
+#### Deadline: 08/11/2022
 _**Tasks**_:
 1. _**[DONE]**_ Train/Validation/Test split (_60%/20%/20%_)
 2. _**[DONE]**_ Bound box creation & image cropping
 3. _**[DONE]**_ Resizing of cropped images
 
-# Sprint 3
-### Deadline: 15/11/2022
+## Sprint 3
+#### Deadline: 15/11/2022
 _**Tasks**_:
 1. _**[DONE]**_ Distribution of photos per person
 2. _**[DONE]**_ EDA of attributes (_histograms, correlation analysis_)
@@ -50,13 +50,13 @@ _**Tasks**_:
 5. _**[DONE]**_ Binary Classification using ResNet on multiple inputs
 
 ## Sprint 4
-### Deadline: 29/11/2022
+#### Deadline: 29/11/2022
 _TBA_
 
 ## Sprint 5
-### Deadline: 13/12/2022
+#### Deadline: 13/12/2022
 _TBA_
 
 ## Final Sprint
-### Deadline: January 2023
+#### Deadline: January 2023
 _TBA_
