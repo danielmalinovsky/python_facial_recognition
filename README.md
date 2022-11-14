@@ -6,7 +6,7 @@ _**Authors**_: Daniel Malinovsky (_*Team Leader*_), Petr Nguyen (_*Lead Data Sci
 _**Deliverable**_: Facial Recognition tool
 
 
-# facial_recognition_v0.1
+# `facial_recognition_v0.1`
 - loading sample data
 - cropping out bounding boxes
 
@@ -18,7 +18,7 @@ Goals:
    - please see: [CelebA](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html)
 
 3. [DONE] Load dataset and ETL if needed
-   - please see: facial_recognition_v0.1
+   - please see: `facial_recognition_v0.1`
 
 # Sprint 2
 ### Deadline: 08.11.22
