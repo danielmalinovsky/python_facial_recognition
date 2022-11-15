@@ -309,8 +309,8 @@ img_resnet
 model = ResNet50(weights='imagenet')
 
 x_test = image.img_to_array(img_resnet)
-x_test = np.expand_dims(x, axis=0)
-x_test = preprocess_input(x)
+x_test = np.expand_dims(x_test, axis=0)
+x_test = preprocess_input(x_test)
 
 preds = model.predict(x_test)
 print('Predicted:', decode_predictions(preds, top=3)[0])
