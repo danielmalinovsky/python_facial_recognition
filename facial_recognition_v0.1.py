@@ -13,7 +13,7 @@ from PIL import Image
 from itertools import compress
 
 from tensorflow.keras.applications.resnet50 import ResNet50
-from tensorflow.keras.layers import Dense, Input, concatenate, Flatten, AveragePooling2D, GlobalAveragePooling2D
+from tensorflow.keras.layers import Dense, Input, Subtract,concatenate, Flatten, AveragePooling2D, GlobalAveragePooling2D
 from tensorflow.keras.models import Model
 from tensorflow.compat.v1 import ConfigProto
 from tensorflow.compat.v1 import InteractiveSession
@@ -309,8 +309,8 @@ img_resnet
 model = ResNet50(weights='imagenet')
 
 x_test = image.img_to_array(img_resnet)
-x_test = np.expand_dims(x_test, axis=0)
-x_test = preprocess_input(x_test)
+x_test = np.expand_dims(x, axis=0)
+x_test = preprocess_input(x)
 
 preds = model.predict(x_test)
 print('Predicted:', decode_predictions(preds, top=3)[0])
@@ -397,48 +397,174 @@ print(croplist1.shape)
 print(croplist2.shape)
 print(labels.shape)
 
+# %% Preparing branches
 
-# %% Using resnet for each branch of the model, and merging model into final layer (binary classification)
+#%%
+base_model = ResNet50(weights = 'imagenet', input_shape = (224,224,3), include_top = False)
+left_input = Input(shape=(224,224,3))
+right_input = Input(shape=(224,224,3))
+#%%
+l = base_model(left_input)
+r = base_model(right_input)
+#%%
+subtracted = Subtract()([l, r])
+subtracted = Flatten()(subtracted)
+preds = Dense(1, activation='sigmoid')(subtracted)
+model = keras.models.Model(inputs=[left_input, right_input], outputs=preds)
 
-#1st branch
-base_model1 = ResNet50(weights='imagenet', input_shape = (224, 224, 3), include_top=False)
-layer1 = base_model1.output
-layer1 = GlobalAveragePooling2D()(layer1)
-predictions1 = Dense(no_classes_1, activation='softmax')(layer1)
-model1 = Model(inputs=base_model1.input, outputs=predictions1)
+model.summary()
+#%%
+model.compile(optimizer ='adam', loss = tf.keras.losses.BinaryCrossentropy(), metrics = ['accuracy'])
+#%%
+modelicek = model.fit([croplist1, croplist2], labels,  epochs=5, validation_split=0.2, shuffle = True) 
 
-#2nd branch
-base_model2 = ResNet50(weights='imagenet', input_shape = (224, 224, 3), include_top=False)
-layer2 = base_model2.output
-layer2 = GlobalAveragePooling2D()(layer2)
-predictions2 = Dense(no_classes_2, activation='softmax')(layer2)
-model2 = Model(inputs=base_model2.input, outputs=predictions2)
+#%%
+### [SPRINT 4] Create data processing pipeline
 
-#Renaming and distinguishing the models' layers.
-for layer in model1.layers :
-    layer._name = layer.name + str('_1')
-for layer in model2.layers :
-    layer._name = layer.name + str('_2')
+#creating a dataframe with paths to the images with their labels
+temp = pd.DataFrame(train_imgs).merge(identity_filtered, on = 'image')
+temp['image'] = './data/Img/img_celeba/' + temp['image']
 
-#Merging and final model
-combo = concatenate([model1.output, model2.output])
-predictions3 = Dense(1, activation='sigmoid')(combo)
-fin_model = Model(inputs = [model1.input, model2.input], outputs = predictions3)
+#separating the images and labels and then creating a TF dataset.
+pics = temp['image'].values
+labels = temp['image_id'].values
+import tensorflow as tf
+dataset = tf.data.Dataset.from_tensor_slices((pics, labels))
+#%%
+#Displaying 1st observation of the dataset
+for d in dataset.take(1):
+    display(d)
 
-fin_model.summary()
+#%%
+#printing the last observation, particularly the last image path as a tensor
+print(d[0]) 
+#%%
+#printing the last image path as numpy (byte string) by converting it from tensor
+print(d[0].numpy())
+#%%
+#decoding the byte string to utf-8 -> therefore, we would assume that this logic will work when mapping a custom function.
+print(d[0].numpy())
+#%%
+#Unfortunately, it doesn't work. According to several sources, we would extract the string path by numpy() method to the tensor. However, it shows an error that tensor doesnt have a numpy object.
+#we tried another approach such as using tf.io.read_file() and tf.image_decode_jpeg() which would be input to the bounding box generator from cv2 library. Though, this neither doesnt work as well.
 
-# %% training lart layer of the model (merge into final model for classification is now trained to output only binary classification)
+def process_images(filename, label):
+    
+    bbox_col_names = {
+                        'x_start' : 'x_1',
+                        'y_start' : 'y_1',
+                        'width' : 'width',
+                        'height' : 'height',
+                        'x_end' : '',
+                        'y_end' : ''}
+        
+    def bbox_engine(pic, m1_scale_factor = 1.1, m1_min_neighbors = 13):
+        h = tf.io.read_file(pic)
+        i = tf.image.decode_jpeg(h)
+        img = np.array(i)
+        face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+        faces = face_cascade.detectMultiScale(image = img, scaleFactor = m1_scale_factor, minNeighbors = m1_min_neighbors)
+        while len(faces) < 1:
+            m1_min_neighbors -= 1
+            faces = face_cascade.detectMultiScale(image = img, scaleFactor =m1_scale_factor, minNeighbors = m1_min_neighbors)
+            if m1_min_neighbors < 0:
+                break
+    
+        if len(faces) > 0:
 
-fin_model.compile(optimizer ='sgd', loss = tf.keras.losses.BinaryCrossentropy(), metrics = ['accuracy'])
+            bbox = {
+                    "x_1" : faces[0][0],
+                    "y_1" : faces[0][1],
+                    "width" : faces[0][2],
+                    "height" : faces[0][3],
+                    'x_end' : faces[0][0] + faces[0][2],
+                    'y_end' : faces[0][1] + faces[0][3]}
 
-modelicek = fin_model.fit([croplist1, croplist2], labels,  epochs=5, validation_split=0.2, shuffle = True) 
+            return bbox
+    # read actual file from path to a Tensor
+    
+    bbox_coordinates = bbox_engine(filename)
+    bbox_generated = pd.DataFrame(columns= ['image_id', 'x_1', 'y_1', 'width', 'height', 'x_end', 'y_end'])
 
-# %% Prediction of image
+    #Generation of bounding boxes for the pic_1, if the bounding boxes are available.
+    if bbox_coordinates != None:
+        bbox_coordinates['image_id'] =tf.io.read_file(filename)
+        bbox_generated = bbox_generated.append(bbox_coordinates, ignore_index = True)
+        startX = bbox_generated[bbox_generated['image_id'] ==tf.io.read_file(filename)][bbox_col_names['x_start']].values[0]
+        startY = bbox_generated[bbox_generated['image_id'] == tf.io.read_file(filename)][bbox_col_names['y_start']].values[0]
+        endX = startX + bbox_generated[bbox_generated['image_id'] ==tf.io.read_file(filename)][bbox_col_names['width']].values[0]
+        endY = startY + bbox_generated[bbox_generated['image_id'] ==tf.io.read_file(filename)][bbox_col_names['height']].values[0]
+        img =  cv2.imread(tf.io.read_file(filename))
+        crop_img = cv2.resize(img[startY:endY, startX:endX], (224, 224))
+        crop_img =tf.convert_to_tensor(crop_img, dtype=tf.float32)
 
-predikce = fin_model.predict([croplist1, croplist2])
+    #If the bounding boxes are not available, input 0 array.
+    else:
+        crop_img = np.zeros(shape = (224, 224, 3))
+        crop_img = tf.convert_to_tensor(crop_img, dtype=tf.float32)
 
-plt.hist(predikce)
+    return crop_img, label
+dataset = dataset.map(process_images)
+
+
+# %%
+## [SPRINT 4] Evaluate training progress
+
+#%%
+base_model = ResNet50(weights = 'imagenet', input_shape = (224,224,3), include_top = False)
+left_input = Input(shape=(224,224,3))
+right_input = Input(shape=(224,224,3))
+#%%
+l = base_model(left_input)
+r = base_model(right_input)
+#%%
+subtracted = Subtract()([l, r])
+subtracted = Flatten()(subtracted)
+preds = Dense(1, activation='sigmoid')(subtracted)
+model = keras.models.Model(inputs=[left_input, right_input], outputs=preds)
+
+model.summary()
+#%%
+model.compile(optimizer ='adam', loss = tf.keras.losses.BinaryCrossentropy(), metrics = ['accuracy'])
+#%%
+train_sample = set(random.choices(identity_filtered['image'].values, k=7000))
+valid_sample = set(random.choices(list(set(identity_filtered['image'].values).difference(train_sample)), k = 3000))
+#%%
+
+tr = identity_filtered[identity_filtered['image'].isin(train_sample)]
+vl = identity_filtered[identity_filtered['image'].isin(valid_sample)]
+#%%
+
+tr_s = tr.merge(attbs.reset_index().rename(columns = {'index':'image'}), on = 'image')
+vl_s = vl.merge(attbs.reset_index().rename(columns = {'index':'image'}), on = 'image')
+
+X_train = tr_s.drop(['image','image_id'], axis=1)
+X_valid = vl_s.drop(['image','image_id'], axis=1)
+
+y_train = tr_s['image_id']
+y_valid = vl_s['image_id']
+#%%
+#Acurracy plot function for both sets
+plt.plot(modelicek.history['acc'])
+plt.plot(modelicek.history['val_acc'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'val'], loc='upper left')
 plt.show()
 
-# %% 
-# [Sprint 3] 
+#Interpration - TBD (Dan pls)
+
+#Loss function plot for both sets
+plt.plot(modelicek.history['loss'])
+plt.plot(modelicek.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'val'], loc='upper left')
+plt.show()
+
+#Interpration - TBD (Dan pls)
+
+#%%
+## [SPRINT 4]
