@@ -9,6 +9,8 @@ import os
 import tensorflow as tf
 import keras as keras
 from PIL import Image
+import warnings
+warnings.filterwarnings('ignore')
 
 from itertools import compress
 
@@ -527,8 +529,8 @@ model.summary()
 #%%
 model.compile(optimizer ='adam', loss = tf.keras.losses.BinaryCrossentropy(), metrics = ['accuracy'])
 #%%
-train_sample = set(random.choices(identity_filtered['image'].values, k=7000))
-valid_sample = set(random.choices(list(set(identity_filtered['image'].values).difference(train_sample)), k = 3000))
+train_sample = set(random.choices(identity_filtered['image'].values, k=700))
+valid_sample = set(random.choices(list(set(identity_filtered['image'].values).difference(train_sample)), k = 300))
 #%%
 
 tr = identity_filtered[identity_filtered['image'].isin(train_sample)]
@@ -536,13 +538,78 @@ vl = identity_filtered[identity_filtered['image'].isin(valid_sample)]
 #%%
 
 tr_s = tr.merge(attbs.reset_index().rename(columns = {'index':'image'}), on = 'image')
+
+tr_crop = []
+bbox_generated = pd.DataFrame(columns= ['image_id', 'x_1', 'y_1', 'width', 'height', 'x_end', 'y_end'])
+for pic in tr_s['image']:
+    bbox_coordinates = src.bbox_engine_img_input(pic, './data/Img/img_celeba/') #Dan, please, change
+
+    #Generation of bounding boxes for the pic_1, if the bounding boxes are available.
+    if bbox_coordinates != None:
+        bbox_coordinates['image_id'] = pic
+        bbox_generated = bbox_generated.append(bbox_coordinates, ignore_index = True)
+        startX = bbox_generated[bbox_generated['image_id'] == pic][bbox_col_names['x_start']].values[0]
+        startY = bbox_generated[bbox_generated['image_id'] == pic][bbox_col_names['y_start']].values[0]
+        endX = startX + bbox_generated[bbox_generated['image_id'] == pic][bbox_col_names['width']].values[0]
+        endY = startY + bbox_generated[bbox_generated['image_id'] == pic][bbox_col_names['height']].values[0]
+        img =  cv2.imread('./data/Img/img_celeba/' + pic)
+        crop_img = cv2.resize(img[startY:endY, startX:endX], (224, 224))
+        crop_img = convert_to_tensor(crop_img, dtype=float32)
+        tr_crop.append(crop_img)
+    #If the bounding boxes are not available, input 0 array.
+    else:
+        print(pic,'... no bounding boxes detected')
+        zz = np.zeros(shape = (224, 224, 3))
+        zz = convert_to_tensor(zz, dtype=float32)
+        tr_crop.append(zz)
+
 vl_s = vl.merge(attbs.reset_index().rename(columns = {'index':'image'}), on = 'image')
 
-X_train = tr_s.drop(['image','image_id'], axis=1)
-X_valid = vl_s.drop(['image','image_id'], axis=1)
+vl_crop = []
+bbox_generated = pd.DataFrame(columns= ['image_id', 'x_1', 'y_1', 'width', 'height', 'x_end', 'y_end'])
+for pic in vl_s['image']:
+    bbox_coordinates = src.bbox_engine_img_input(pic, './data/Img/img_celeba/') #Dan, please, change
 
-y_train = tr_s['image_id']
-y_valid = vl_s['image_id']
+    #Generation of bounding boxes for the pic_1, if the bounding boxes are available.
+    if bbox_coordinates != None:
+        bbox_coordinates['image_id'] = pic
+        bbox_generated = bbox_generated.append(bbox_coordinates, ignore_index = True)
+        startX = bbox_generated[bbox_generated['image_id'] == pic][bbox_col_names['x_start']].values[0]
+        startY = bbox_generated[bbox_generated['image_id'] == pic][bbox_col_names['y_start']].values[0]
+        endX = startX + bbox_generated[bbox_generated['image_id'] == pic][bbox_col_names['width']].values[0]
+        endY = startY + bbox_generated[bbox_generated['image_id'] == pic][bbox_col_names['height']].values[0]
+        img =  cv2.imread('./data/Img/img_celeba/' + pic)
+        crop_img = cv2.resize(img[startY:endY, startX:endX], (224, 224))
+        crop_img = convert_to_tensor(crop_img, dtype=float32)
+        vl_crop.append(crop_img)
+    #If the bounding boxes are not available, input 0 array.
+    else:
+        print(pic,'... no bounding boxes detected')
+        zz = np.zeros(shape = (224, 224, 3))
+        zz = convert_to_tensor(zz, dtype=float32)
+        vl_crop.append(zz)
+#%%
+
+print(len(tr_crop))
+print(len(vl_crop))
+
+# %% Filtering image pairs with bboxes and converting numpy arrays of images into tensorflow objects
+
+inds_to_keep_tr = [False if np.sum(tr_crop[i].numpy()) == 0 else True for i in range(len(tr_crop))]
+inds_to_keep_vl = [False if np.sum(vl_crop[i].numpy()) == 0 else True for i in range(len(vl_crop))]
+
+#tf.stack -> convert numpy arrays into tensorflow objects.
+X_train = stack(np.asarray(list(compress(tr_crop, inds_to_keep_tr))))
+X_valid = stack(np.asarray(list(compress(vl_crop, inds_to_keep_vl))))
+y_train = stack(tr_s.loc[inds_to_keep_tr,'image_id'].values)
+y_valid = stack(vl_s.loc[inds_to_keep_vl,'image_id'].values)
+print(X_train.shape)
+print(X_valid.shape)
+print(y_train.shape)
+print(y_valid.shape)
+#%%
+
+
 #%%
 #Acurracy plot function for both sets
 plt.plot(modelicek.history['acc'])
@@ -567,4 +634,240 @@ plt.show()
 #Interpration - TBD (Dan pls)
 
 #%%
-## [SPRINT 4]
+## [SPRINT 4] team photos
+
+photo_initials = ['PN','DM','PH','RP','NM']
+
+bbox_generated = pd.DataFrame(columns= ['image_id', 'x_1', 'y_1', 'width', 'height', 'x_end', 'y_end'])
+data = []
+#temp = []
+for init_name in photo_initials:
+    for num in ['1','2','3','4']:
+        bbox_coordinates = src.bbox_engine_img_input(f'{init_name}_{num}.jpg', './team_photos/')
+        bbox_coordinates['image_id'] = f'{init_name}_{num}.jpg'
+        bbox_generated = bbox_generated.append(bbox_coordinates, ignore_index = True)
+        startX = bbox_generated[bbox_generated['image_id'] == f'{init_name}_{num}.jpg'][bbox_col_names['x_start']].values[0]
+        startY = bbox_generated[bbox_generated['image_id'] == f'{init_name}_{num}.jpg'][bbox_col_names['y_start']].values[0]
+        endX = startX + bbox_generated[bbox_generated['image_id'] == f'{init_name}_{num}.jpg'][bbox_col_names['width']].values[0]
+        endY = startY + bbox_generated[bbox_generated['image_id'] == f'{init_name}_{num}.jpg'][bbox_col_names['height']].values[0]
+        img =  cv2.imread( './team_photos/'+ f'{init_name}_{num}.jpg')
+        crop_img = cv2.resize(img[startY:endY, startX:endX], (224, 224))
+        #temp.append(crop_img)
+        #crop_img = convert_to_tensor(crop_img, dtype=float32)
+        data.append(crop_img)
+
+#%%
+photo_names = [i+'_'+j for i in photo_initials for j in ['1','2','3','4']]
+#%%
+annotations = [num for num, _ in enumerate(photo_initials)]
+labels = [annot for annot in annotations for i in range(0,4)]
+train_ind = []
+test_ind = []
+for i, phot in enumerate(photo_names):
+    if phot.split('_')[1] in (['3','4']):
+        test_ind.append(i)
+    else:
+        train_ind.append(i)
+#%%
+data_train = [data[i] for i in train_ind]
+y_train = [labels[i] for i in train_ind]
+data_test = [data[i] for i in test_ind]
+y_test = [labels[i] for i in test_ind]
+
+
+y_train = np.array(y_train)
+y_test = np.array(y_test)
+data_test = np.array(data_test)
+data_train = np.array(data_train)
+# %%
+def sort_labels_by_classes(labs):
+    result = []
+    for i in range(len(photo_initials)):
+        #  np.where returns the indices of elements in an input array where the given condition is satisfied
+        result.append(np.where(labs == i)[0])
+    return result
+#%%
+train_classes = sort_labels_by_classes(y_train)
+test_classes = sort_labels_by_classes(y_test)
+# %%
+def create_triplets(data, labels):
+    triplets_data = []
+    class_count = len(photo_initials)
+    # go per each of cloth class
+    for i in range(len(labels)):
+        # class for processing
+        class_label_length = len(labels[i])
+        # go for each of item in current cloth class
+        for j in range(class_label_length - 1):
+            # get the positive pair - n and n+1 item from current label
+            idx1, idx2 = labels[i][j], labels[i][j + 1]
+            # random generate increment from 1-9 to add to current class index
+            inc = random.randrange(1, class_count)
+            # add increment to class index and apply modulo by class count to get random negative class label index
+            negative_label_index = (i + inc) % class_count
+            # take random item from other label items to create a negative pair
+            negative_sample = random.choice(labels[negative_label_index])
+            # save negative pair and set label to 0
+            triplets_data.append([data[idx1], data[idx2], data[negative_sample]])
+    # numpy arrays are easier to work with, so type list into it
+    return np.array(triplets_data)
+
+# %%
+X_train = create_triplets(data_train, train_classes)
+X_test = create_triplets(data_test, test_classes)
+# %%
+def show_image(image):
+    plt.figure()
+    plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    plt.colorbar()
+    plt.grid(False)
+    plt.show()
+
+triplet = 0
+# show images at this index
+show_image(X_train[triplet][0])
+show_image(X_train[triplet][1])
+show_image(X_train[triplet][2])
+# %%
+def initialize_base_network():
+    input = Input(shape=(224,224,3))
+    x = Flatten()(input)
+    x = Dense(1200, activation='relu')(x)
+    x = Dense(1200, activation='relu')(x)
+    x = Dense(1200, activation='relu')(x)
+    return Model(inputs=input, outputs=x)
+#%%
+embedding = initialize_base_network()
+tf.keras.utils.plot_model(embedding, show_shapes=True)
+# %%
+import tensorflow.keras.backend as K
+class SiameseNet(tf.keras.layers.Layer):
+    # set the backbone model in constructor
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+
+    def call(self, feat):
+        # get feature vectors from anchor
+        feats = self.model(feat[0])
+        # from positive image
+        pfeats = self.model(feat[1])
+        # and from negative image
+        nfeats = self.model(feat[2])
+        # concatenate vectors to a matrix
+        result = tf.stack([feats, pfeats, nfeats])
+        return result
+class TripletLoss(tf.keras.layers.Layer):
+    # margin is settable hyperparameter in constructor
+    def __init__(self, margin):
+        self.margin = margin
+        super().__init__()
+        
+    # function calculating distance between features
+    def distance(self, x, y):
+        sum_square = tf.reduce_sum(tf.square(x - y), axis=1, keepdims=True)
+        return tf.sqrt(tf.maximum(sum_square, K.epsilon()))
+    
+
+    def call(self, features):
+        # get anchor-positive distance
+        pos = self.distance(features[0], features[1])
+        # anchor-negative distance
+        neg = self.distance(features[0], features[2])
+        # difference between anchor positive and anchor negative distances
+        loss = pos - neg
+        # get overall loss
+        return tf.maximum(loss + self.margin, 0.0)
+# %%
+def identity_loss(y_true, y_pred):
+    return tf.reduce_mean(y_pred)
+#%%
+# anchor branch
+image_input = Input(shape=(224,224,3), name='image_input')
+# positive image branch
+positive_input = Input(shape=(224,224,3), name='positive_input')
+# negative image branch
+negative_input = Input(shape=(224,224,3), name='negative_input')
+
+siamese = SiameseNet(embedding)([image_input, positive_input, negative_input])
+loss = TripletLoss(margin=1.0)(siamese)
+model = Model(inputs=[image_input, positive_input, negative_input], outputs=loss)
+model.compile(optimizer = tf.keras.optimizers.Adam(), loss = identity_loss)
+tf.keras.utils.plot_model(model, show_shapes=True)
+# %%
+# we don't need labels, everything is handled inside triplet loss layer, so we just set labels to 1, they will not be used anyway
+history = model.fit([X_train[:,0], X_train[:,1], X_train[:,2]], np.ones(X_train.shape[0]), batch_size=128, verbose=1, validation_data=([X_test[:,0], X_test[:,1], X_test[:,2]], np.ones(X_test.shape[0])), epochs=20)
+# %%
+def plot_metrics(metric_name, title, ylim=5):
+    plt.title(title)
+    plt.ylim(0,ylim)
+    plt.plot(history.history[metric_name],color='blue',label=metric_name)
+    plt.plot(history.history['val_' + metric_name],color='green',label='val_' + metric_name)
+    plt.grid()
+    plt.legend()
+plot_metrics(metric_name='loss', title="Loss", ylim=0.2)
+#%%
+def create_pairs(data, labels):
+    pairs_data = []
+    pairs_labels = []
+    class_count = len(photo_initials)
+    # go per each of cloth class
+    for i in range(len(labels)):
+        # class for processing
+        class_label_length = len(labels[i])
+        # go for each of item in current cloth class
+        for j in range(class_label_length - 1):
+            # get the positive pair - n and n+1 item from current label
+            idx1, idx2 = labels[i][j], labels[i][j + 1]
+            # save to list and set label to 1
+            pairs_data.append([data[idx1], data[idx2]])
+            pairs_labels.append(1.0)
+
+            # random generate increment from 1-9 to add to current class index
+            inc = random.randrange(1, class_count)
+            # add increment to class index and apply modulo by class count to get random negative class label index
+            negative_label_index = (i + inc) % class_count
+            # take random item from other label items to create a negative pair
+            negative_sample = random.choice(labels[negative_label_index])
+            # save negative pair and set label to 0
+            pairs_data.append([data[idx1], data[negative_sample]])
+            pairs_labels.append(0.0)
+    # numpy arrays are easier to work with, so type list into it
+    return np.array(pairs_data), np.array(pairs_labels)
+# %%
+X_test, Y_test = create_pairs(data_test, test_classes)
+left_pair = X_test[:,0]
+left_pair_pred = embedding.predict(left_pair)
+right_pair = X_test[:,1]
+right_pair_pred = embedding.predict(right_pair)
+positive_left_pred = left_pair_pred[0::2]
+positive_right_pred = right_pair_pred[0::2]
+positive_distances = np.linalg.norm(positive_left_pred - positive_right_pred, axis=1)
+negative_left_pred = left_pair_pred[1::2]
+negative_right_pred = right_pair_pred[1::2]
+negative_distances = np.linalg.norm(negative_left_pred - negative_right_pred, axis=1)
+
+#%%
+pd.Series(positive_distances).describe()
+#%%
+from sklearn.metrics import confusion_matrix
+
+confusion_matrix()
+
+#%%
+fig = plt.figure()
+ax = fig.add_axes([0,0,1, 1])
+ax.boxplot([positive_distances, negative_distances])
+plt.xticks([1, 2], ['Positive', 'Negative'])
+ax.grid()
+plt.show()
+#%%
+def compute_accuracy(left_pred, right_pred, y_true):
+    y_pred = np.linalg.norm(left_pair_pred - right_pair_pred, axis=1)
+#     # 1 for the same - distance is smaller than 3.0, 0 for the different
+    pred = y_pred < 7.0
+    return np.mean(pred == y_true)
+
+test_accuracy = compute_accuracy(embedding.predict(X_test[:,0]), embedding.predict(X_test[:,1]), y_test)
+print(f'Test accuracy: {test_accuracy*100:.2f}%')
+# %%
