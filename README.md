@@ -54,7 +54,7 @@ _**Tasks**_:
 _**Tasks**_:
 1. _**[Not finished]**_ Create data processing pipeline for processing face images (_using Tensorflow data API_)
 2. _**[DONE]**_ Training process evaluation (_plotting loss functions, confusion matrices etc._)
-3. _**[DONE]**_ Classification of each team member's photo (_with uploading photos and subsequent cropping using a face detector and predicting feature vectors)
+3. _**[DONE]**_ Classification of each team member's photo (_with uploading photos and subsequent cropping using a face detector and predicting feature vectors_)
 
 ## Sprint 5
 #### Deadline: 13/12/2022
