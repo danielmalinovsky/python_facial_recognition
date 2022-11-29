@@ -13,7 +13,7 @@ _**Deliverable**_: Face Recognition & Detection tool implemented in Python
 - Other tasks (_Presentations of sprints, regular communication with the Product Owners, SCRUM practices_)
 
 
-## facial_recognition_v0.1`
+## `facial_recognition_v0.1`
 - Loading sample data
 - Cropping out bounding boxes
 - Splitting the data
