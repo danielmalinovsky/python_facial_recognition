@@ -3,10 +3,10 @@ Repository for the _Facial Image Recognition_ project in Python within the cours
 
 _**Authors and Members of the Machine Learning team**_:
 - [**Daniel Malinovsky**](https://www.linkedin.com/in/daniel-malinovsky-88b162198) (_**Team Leader**_)
-- [**Petr Nguyen**](https://www.linkedin.com/in/petr-ngn) (_Lead Data Scientist_)
-- [Petr Hollmann](https://www.linkedin.com/in/petr-hollmann-3583aa208) (_regular member_)
-- [Roman Pavlata](https://www.linkedin.com/in/roman-pavlata-a3b602161) (_regular member_)
-- [Natalie Musilova](https://www.linkedin.com/in/natálie-musilová-3b98287a) (_regular member_)
+- [**Petr Nguyen**](https://www.linkedin.com/in/petr-ngn) (_**Lead Data Scientist**_)
+- [Petr Hollmann](https://www.linkedin.com/in/petr-hollmann-3583aa208) (_Regular member_)
+- [Roman Pavlata](https://www.linkedin.com/in/roman-pavlata-a3b602161) (_Regular member_)
+- [Natalie Musilova](https://www.linkedin.com/in/natálie-musilová-3b98287a) (_Regular member_)
 
 This course is being surpervised by the Data Scientists and AI & ML Engineers at [**CN Group CZ**](https://www.linkedin.com/company/cngroup-dk), namely by [Petr Polak](https://www.linkedin.com/in/87petrpolak), [Patrik Tison](https://www.linkedin.com/in/patriktison), Viktor Stepanuk, Marek Hronek and [Tomas Kliment](https://www.linkedin.com/in/tomáš-kliment-b74120196).
 
