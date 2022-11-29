@@ -52,13 +52,41 @@ _**Tasks**_:
 ## Sprint 4
 #### Deadline: 29/11/2022
 _**Tasks**_:
-1. _**[Not finished]**_ Create data processing pipeline for processing face images (_using Tensorflow data API_)
+1. _**[Will be done within the next sprint]**_ Create data processing pipeline for processing face images (_using Tensorflow data API_)
 2. _**[DONE]**_ Training process evaluation (_plotting loss functions, confusion matrices etc._)
 3. _**[DONE]**_ Classification of each team member's photo (_with uploading photos and subsequent cropping using a face detector and predicting feature vectors_)
 
 ## Sprint 5
 #### Deadline: 13/12/2022
-_TBA_
+1. Generate triplets
+   - _Triplet contains 2 different photos of the same person and 1 photo of somebody else_
+   - _Create a function that returns a given number of triplets_
+   - _Generate triplets for NN training_
+2. Create model using contrastive loss
+   - _Assemble model with pairs of images on input_
+   - _Use pre-trained image classification architecture as a feature extractor_
+   - _Using contrastive loss as a cost function_
+   - _Use feature extractor from model to make predictions_
+   - _Evaluate predictions using some distance measure (for example Euclidean distance)_
+   - _Estimate threshold for the distance between positive/positive and negative/negative_
+   - _Predict on pair of images using distance measure and selected threshold_
+3. Create model using triplet loss
+   - _Assemble model with triplets with images on input_
+   - _Use pre-trained image classification architecture as a feature extractor_
+   - _Using triplet loss as a cost function_
+   - _Use feature extractor from model to make predictions_
+   - _Evaluate predictions using some distance measure (for example Euclidean distance)_
+   - _Estimate threshold for the distance between positive/positive and negative/negative_
+   - _Predict on pair of images using distance measure and selected threshold_
+4. Train model on Google Colab
+   - _Pick the model you want to try first from the three architectures_
+   - _Copy images of persons for training to Google Drive_
+   - _Mount Google Drive in Colab_
+   - _Train the model on the images_
+   - _Trained model on at least 5000 samples of images (pairs or triplets)_
+   - _Save the trained model and loss function progress during training_
+   - _Download saved model to local machine_
+   - _Run inference on local machine with sample of images (from a testing dataset)_
 
 ## Final Sprint
 #### Deadline: January 2023
