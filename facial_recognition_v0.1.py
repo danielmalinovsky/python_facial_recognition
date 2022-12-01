@@ -311,8 +311,8 @@ img_resnet
 model = ResNet50(weights='imagenet')
 
 x_test = image.img_to_array(img_resnet)
-x_test = np.expand_dims(x, axis=0)
-x_test = preprocess_input(x)
+x_test = np.expand_dims(x_test, axis=0)
+x_test = preprocess_input(x_test)
 
 preds = model.predict(x_test)
 print('Predicted:', decode_predictions(preds, top=3)[0])
@@ -633,6 +633,26 @@ plt.show()
 
 #Interpration - TBD (Dan pls)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #%%
 ## [SPRINT 4] team photos
 
@@ -640,7 +660,8 @@ photo_initials = ['PN','DM','PH','RP','NM']
 
 bbox_generated = pd.DataFrame(columns= ['image_id', 'x_1', 'y_1', 'width', 'height', 'x_end', 'y_end'])
 data = []
-#temp = []
+
+#cropping photos
 for init_name in photo_initials:
     for num in ['1','2','3','4']:
         bbox_coordinates = src.bbox_engine_img_input(f'{init_name}_{num}.jpg', './team_photos/')
@@ -659,6 +680,7 @@ for init_name in photo_initials:
 #%%
 photo_names = [i+'_'+j for i in photo_initials for j in ['1','2','3','4']]
 #%%
+#train test split
 annotations = [num for num, _ in enumerate(photo_initials)]
 labels = [annot for annot in annotations for i in range(0,4)]
 train_ind = []
@@ -680,6 +702,7 @@ y_test = np.array(y_test)
 data_test = np.array(data_test)
 data_train = np.array(data_train)
 # %%
+#function from Viktor
 def sort_labels_by_classes(labs):
     result = []
     for i in range(len(photo_initials)):
@@ -690,6 +713,8 @@ def sort_labels_by_classes(labs):
 train_classes = sort_labels_by_classes(y_train)
 test_classes = sort_labels_by_classes(y_test)
 # %%
+
+#function from Viktor
 def create_triplets(data, labels):
     triplets_data = []
     class_count = len(photo_initials)
@@ -723,7 +748,7 @@ def show_image(image):
     plt.grid(False)
     plt.show()
 
-triplet = 0
+triplet = 3
 # show images at this index
 show_image(X_train[triplet][0])
 show_image(X_train[triplet][1])
@@ -806,11 +831,16 @@ def plot_metrics(metric_name, title, ylim=5):
     plt.grid()
     plt.legend()
 plot_metrics(metric_name='loss', title="Loss", ylim=0.2)
+
+
+
 #%%
 def create_pairs(data, labels):
     pairs_data = []
     pairs_labels = []
+    ids = []
     class_count = len(photo_initials)
+
     # go per each of cloth class
     for i in range(len(labels)):
         # class for processing
@@ -822,6 +852,7 @@ def create_pairs(data, labels):
             # save to list and set label to 1
             pairs_data.append([data[idx1], data[idx2]])
             pairs_labels.append(1.0)
+            ids.append([i, i])
 
             # random generate increment from 1-9 to add to current class index
             inc = random.randrange(1, class_count)
@@ -832,10 +863,12 @@ def create_pairs(data, labels):
             # save negative pair and set label to 0
             pairs_data.append([data[idx1], data[negative_sample]])
             pairs_labels.append(0.0)
+            ids.append([i, negative_label_index])
+
     # numpy arrays are easier to work with, so type list into it
-    return np.array(pairs_data), np.array(pairs_labels)
+    return np.array(pairs_data), np.array(pairs_labels), np.array(ids)
 # %%
-X_test, Y_test = create_pairs(data_test, test_classes)
+X_test, Y_test, ids = create_pairs(data_test, test_classes)
 left_pair = X_test[:,0]
 left_pair_pred = embedding.predict(left_pair)
 right_pair = X_test[:,1]
@@ -850,9 +883,15 @@ negative_distances = np.linalg.norm(negative_left_pred - negative_right_pred, ax
 #%%
 pd.Series(positive_distances).describe()
 #%%
-from sklearn.metrics import confusion_matrix
 
-confusion_matrix()
+
+
+
+
+
+
+
+
 
 #%%
 fig = plt.figure()
@@ -861,13 +900,20 @@ ax.boxplot([positive_distances, negative_distances])
 plt.xticks([1, 2], ['Positive', 'Negative'])
 ax.grid()
 plt.show()
-#%%
+
+
+#%% 
 def compute_accuracy(left_pred, right_pred, y_true):
     y_pred = np.linalg.norm(left_pair_pred - right_pair_pred, axis=1)
 #     # 1 for the same - distance is smaller than 3.0, 0 for the different
     pred = y_pred < 7.0
     return np.mean(pred == y_true)
 
-test_accuracy = compute_accuracy(embedding.predict(X_test[:,0]), embedding.predict(X_test[:,1]), y_test)
+test_accuracy = compute_accuracy(embedding.predict(X_test[:,0]), embedding.predict(X_test[:,1]), Y_test)
 print(f'Test accuracy: {test_accuracy*100:.2f}%')
 # %%
+from sklearn.metrics import confusion_matrix
+preds = (np.linalg.norm(left_pair_pred - right_pair_pred, axis=1) < 7.0)
+confusion_matrix(Y_test, preds)
+# %%
+
