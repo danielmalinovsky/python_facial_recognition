@@ -57,17 +57,17 @@ _**Tasks**_:
 ## Sprint 4
 #### Deadline: 29/11/2022
 _**Tasks**_:
-1. _**[NOT DONE YET]**_ Create data processing pipeline for processing face images (_using Tensorflow data API_)
+1. _**[DONE]**_ Create data processing pipeline for processing face images (_using Tensorflow data API_)
 2. _**[DONE]**_ Training process evaluation (_plotting loss functions, confusion matrices etc._)
 3. _**[DONE]**_ Classification of each team member's photo (_with uploading photos and subsequent cropping using a face detector and predicting feature vectors_)
 
 ## Sprint 5
 #### Deadline: 13/12/2022
-1. Generate triplets
+1. _**[DONE]**_ Generate triplets
    - _Triplet contains 2 different photos of the same person and 1 photo of somebody else_
    - _Create a function that returns a given number of triplets_
    - _Generate triplets for NN training_
-2. Create model using contrastive loss
+2. _**[DONE]**_ Create model using contrastive loss
    - _Assemble model with pairs of images on input_
    - _Use pre-trained image classification architecture as a feature extractor_
    - _Using contrastive loss as a cost function_
@@ -75,7 +75,7 @@ _**Tasks**_:
    - _Evaluate predictions using some distance measure (for example Euclidean distance)_
    - _Estimate threshold for the distance between positive/positive and negative/negative_
    - _Predict on pair of images using distance measure and selected threshold_
-3. Create model using triplet loss
+3. _**[DONE]**_ Create model using triplet loss
    - _Assemble model with triplets with images on input_
    - _Use pre-trained image classification architecture as a feature extractor_
    - _Using triplet loss as a cost function_
