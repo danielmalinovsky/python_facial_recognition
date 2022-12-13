@@ -96,8 +96,7 @@ _**Tasks**_:
 ## Final Sprint
 #### Deadline: January 2023
 1. Train a model that has 70+ % accuracy
-   - _Pick an architecture from the three you implemented in last sprints_
-   - _Train a model_
+   - _Pick an architecture from the three you implemented in last sprints and train a model_
    - _Achieve 70%+ accuracy on 1000 randomly sampled balanced (500 positive/500 negative pairs) picture pairs from testing set (the set model never seen during training)_
 3. Describe you pipeline and model
    - _Describe your data processing pipeline and comment on your decisions_
