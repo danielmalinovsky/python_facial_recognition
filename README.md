@@ -83,7 +83,7 @@ _**Tasks**_:
    - _Evaluate predictions using some distance measure (for example Euclidean distance)_
    - _Estimate threshold for the distance between positive/positive and negative/negative_
    - _Predict on pair of images using distance measure and selected threshold_
-4. Train model on Google Colab
+4. _**[DONE]**_ Train model on Google Colab
    - _Pick the model you want to try first from the three architectures_
    - _Copy images of persons for training to Google Drive_
    - _Mount Google Drive in Colab_
@@ -95,4 +95,16 @@ _**Tasks**_:
 
 ## Final Sprint
 #### Deadline: January 2023
-_TBA_
+1. Train a model that has 70+ % accuracy
+   - _Pick an architecture from the three you implemented in last sprints_
+   - _Train a model_
+   - _Achieve 70%+ accuracy on 1000 randomly sampled balanced (500 positive/500 negative pairs) picture pairs from testing set (the set model never seen during training)_
+3. Describe you pipeline and model
+   - _Describe your data processing pipeline and comment on your decisions_
+   - _Describe your model, process of hyperparameters selections, why you pick the chosen architecture_
+   - _Describe training process (what were values of validation loss and training loss, if you encountered overfiting during training, how did you deal with that, etc…)_
+   - _Present the analysis (either in Jupyter Notebook or PowerPoint)_
+2. Live demo
+   - _Compute feature vectors on reference images of yours using trained model and save the feature vectors in a file_
+   - _Take a picture of each of team member on site, load them to the model and run predictions to get feature vectors from the new picture_
+   - _Classify if a person on the new picture is someone from precomputed feature vectors in the file (either comptunig distance metric or binary classificator, depending on the selected achitecture)_
